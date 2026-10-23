@@ -33,6 +33,9 @@ struct SettingsView: View {
                         SettingsRow("Show next event in menu bar", icon: "menubar.rectangle", tint: .blue) {
                             Toggle("Show next event in menu bar", isOn: $settings.showNextEventInMenuBar)
                         }
+                        SettingsRow("Show past events", icon: "clock.arrow.circlepath", tint: .gray) {
+                            Toggle("Show past events", isOn: $settings.showPastEvents)
+                        }
                     }
 
                     SettingsGroup("Reminders") {
@@ -51,11 +54,30 @@ struct SettingsView: View {
                     }
 
                     SettingsGroup("App") {
-                        SettingsRow("Language", icon: "globe", tint: .teal) {
-                            Button("Change…") {
-                                openSystemSettings("x-apple.systempreferences:com.apple.Localization-Settings.extension")
+                        SettingsRow("Appearance", icon: "circle.lefthalf.filled", tint: .indigo) {
+                            Picker("Appearance", selection: $settings.appearance) {
+                                ForEach(AppearanceMode.allCases) { mode in
+                                    Label(mode.title, systemImage: mode.icon)
+                                        .labelStyle(.iconOnly)
+                                        .help(Text(mode.title))
+                                        .tag(mode)
+                                }
                             }
+                            .pickerStyle(.segmented)
+                            .fixedSize()
                         }
+                        SettingsRow("Language", icon: "globe", tint: .teal) {
+                            Picker("Language", selection: languageSelection) {
+                                ForEach(AppLanguage.allCases) { language in
+                                    Text(verbatim: language.nativeName).tag(language)
+                                }
+                            }
+                            .fixedSize()
+                        }
+                        Text("UpNext Bar restarts to switch the language.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.leading, 48)
                         SettingsRow("Version", icon: "info.circle.fill", tint: .purple) {
                             Text(appVersion).foregroundStyle(.secondary)
                         }
@@ -88,18 +110,39 @@ struct SettingsView: View {
         .onChange(of: settings.reminderHour) {
             model.rescheduleReminders()
         }
+        .onChange(of: settings.appearance) {
+            model.applyAppearance()
+        }
         .task { await model.refreshNotificationStatus() }
+        // The user may come back from System Settings with this screen still open.
+        .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+            Task { await model.refreshNotificationStatus() }
+        }
+    }
+
+    private var languageSelection: Binding<AppLanguage> {
+        Binding(get: { model.settings.language }, set: { model.changeLanguage(to: $0) })
     }
 
     @ViewBuilder
     private var notificationStatus: some View {
         switch model.notificationStatus {
         case .authorized, .provisional:
-            Label("On", systemImage: "checkmark.circle.fill")
-                .foregroundStyle(.green)
+            HStack(spacing: 6) {
+                if model.bannersEnabled {
+                    Label("On", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                } else {
+                    Label("Banners off", systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                }
+                CircleIconButton("arrow.up.forward", help: "Open Settings…") {
+                    model.openNotificationSettings()
+                }
+            }
         case .denied:
             Button("Open Settings…") {
-                openSystemSettings("x-apple.systempreferences:com.apple.Notifications-Settings.extension")
+                model.openNotificationSettings()
             }
         default:
             Button("Allow") {
@@ -117,12 +160,6 @@ struct SettingsView: View {
 
     private var appVersion: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
-    }
-
-    private func openSystemSettings(_ address: String) {
-        if let url = URL(string: address) {
-            NSWorkspace.shared.open(url)
-        }
     }
 }
 

@@ -71,6 +71,16 @@ struct ScheduleTests {
             #expect(Schedule.nextOccurrence(of: anchor, recurrence: recurrence, onOrAfter: day(2026, 10, 23)) == anchor)
         }
     }
+
+    @Test func consecutiveOccurrences() {
+        let today = day(2026, 10, 23)
+        #expect(Schedule.occurrences(of: day(2026, 11, 5), recurrence: .weekly, onOrAfter: today, count: 3)
+            == [day(2026, 11, 5), day(2026, 11, 12), day(2026, 11, 19)])
+        #expect(Schedule.occurrences(of: day(2026, 1, 31), recurrence: .monthly, onOrAfter: today, count: 3)
+            == [day(2026, 10, 31), day(2026, 11, 30), day(2026, 12, 31)])
+        #expect(Schedule.occurrences(of: day(2026, 11, 5), recurrence: .never, onOrAfter: today, count: 3) == [day(2026, 11, 5)])
+        #expect(Schedule.occurrences(of: day(2026, 1, 5), recurrence: .never, onOrAfter: today, count: 3).isEmpty)
+    }
 }
 
 struct TimelineTests {

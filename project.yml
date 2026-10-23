@@ -45,6 +45,7 @@ targets:
       base:
         PRODUCT_NAME: UpNextBar
         PRODUCT_BUNDLE_IDENTIFIER: com.upnextbar.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       configs:
         # Only for Release: with ad-hoc signing, library validation would block the test bundle in Debug.
         Release:

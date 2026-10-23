@@ -185,6 +185,22 @@
         }
       }
     },
+    "Appearance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вигляд"
+          }
+        }
+      }
+    },
     "Back": {
       "localizations": {
         "en": {
@@ -197,6 +213,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Назад"
+          }
+        }
+      }
+    },
+    "Banners are off for UpNext Bar, so reminders won't pop up on screen.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Banners are off for UpNext Bar, so reminders won't pop up on screen."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Банери для UpNext Bar вимкнено, тож нагадування не з’являтимуться на екрані."
+          }
+        }
+      }
+    },
+    "Banners off": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Banners off"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Банери вимкнено"
           }
         }
       }
@@ -265,22 +313,6 @@
         }
       }
     },
-    "Change…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Change…"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Змінити…"
-          }
-        }
-      }
-    },
     "Color": {
       "localizations": {
         "en": {
@@ -309,6 +341,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Щодня"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dark"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Темний"
           }
         }
       }
@@ -553,6 +601,22 @@
         }
       }
     },
+    "Light": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Світлий"
+          }
+        }
+      }
+    },
     "Monthly": {
       "localizations": {
         "en": {
@@ -629,6 +693,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Нова подія"
+          }
+        }
+      }
+    },
+    "Next: %@…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next: %@…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Наступні: %@…"
           }
         }
       }
@@ -793,22 +873,6 @@
         }
       }
     },
-    "Past": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Past"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Минулі"
-          }
-        }
-      }
-    },
     "Pink": {
       "localizations": {
         "en": {
@@ -969,6 +1033,38 @@
         }
       }
     },
+    "Show past events": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show past events"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показувати минулі події"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Системний"
+          }
+        }
+      }
+    },
     "Teal": {
       "localizations": {
         "en": {
@@ -981,6 +1077,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Бірюзовий"
+          }
+        }
+      }
+    },
+    "Then %@…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Then %@…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Далі %@…"
           }
         }
       }
@@ -1045,6 +1157,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "UpNext"
+          }
+        }
+      }
+    },
+    "UpNext Bar restarts to switch the language.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UpNext Bar restarts to switch the language."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UpNext Bar перезапуститься, щоб змінити мову."
           }
         }
       }

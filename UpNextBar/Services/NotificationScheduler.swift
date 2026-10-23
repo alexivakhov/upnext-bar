@@ -9,8 +9,10 @@ final class NotificationScheduler {
         UNUserNotificationCenter.current().delegate = delegate
     }
 
-    func authorizationStatus() async -> UNAuthorizationStatus {
-        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    /// Authorization plus the alert style the user picked in System Settings (`.none` means no banners).
+    func currentSettings() async -> (status: UNAuthorizationStatus, alertStyle: UNAlertStyle) {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        return (settings.authorizationStatus, settings.alertStyle)
     }
 
     func requestAuthorization() async -> Bool {

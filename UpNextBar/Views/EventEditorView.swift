@@ -104,6 +104,28 @@ struct EventEditorView: View {
                 .fixedSize()
                 .help(Text("Repeat"))
             }
+
+            if let followingDates {
+                followingDates
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.leading, 4)
+            }
+        }
+    }
+
+    /// For a repeating event, the two occurrences after the date shown above, or the next two when that date has passed.
+    private var followingDates: Text? {
+        guard draft.recurrence != .never else { return nil }
+        let today = model.today
+        let dates = Schedule.occurrences(of: draft.date, recurrence: draft.recurrence, onOrAfter: today, count: 3)
+        let style = Date.FormatStyle.dateTime.day(.twoDigits).month(.twoDigits).year(.twoDigits)
+        if draft.date >= today {
+            let list = dates.dropFirst().map { $0.date().formatted(style) }.joined(separator: ", ")
+            return Text("Then \(list)…")
+        } else {
+            let list = dates.prefix(2).map { $0.date().formatted(style) }.joined(separator: ", ")
+            return Text("Next: \(list)…")
         }
     }
 
@@ -168,10 +190,19 @@ struct EventEditorView: View {
                 .labelsHidden()
 
                 if draft.reminder != .none {
-                    if model.notificationStatus == .denied {
-                        Label("Notifications are turned off for UpNext Bar in System Settings.", systemImage: "exclamationmark.triangle.fill")
-                            .font(.caption)
+                    if model.notificationStatus == .denied || !model.bannersEnabled {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Label(
+                                model.notificationStatus == .denied
+                                    ? "Notifications are turned off for UpNext Bar in System Settings."
+                                    : "Banners are off for UpNext Bar, so reminders won't pop up on screen.",
+                                systemImage: "exclamationmark.triangle.fill"
+                            )
                             .foregroundStyle(.orange)
+                            Button("Open Settings…") { model.openNotificationSettings() }
+                                .buttonStyle(.link)
+                        }
+                        .font(.caption)
                     } else {
                         Text("Notification at \(reminderTime). You can change the time in Settings.")
                             .font(.caption)
@@ -180,6 +211,7 @@ struct EventEditorView: View {
                 }
             }
         }
+        .task { await model.refreshNotificationStatus() }
     }
 
     private var deleteButton: some View {
