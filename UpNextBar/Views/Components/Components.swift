@@ -120,3 +120,74 @@ struct SymbolPattern: View {
         .accessibilityHidden(true)
     }
 }
+
+// MARK: - Confirmation
+
+extension View {
+    /// A confirmation drawn inside the popup. System alerts and confirmation dialogs open as a sheet window
+    /// that the menu bar panel can't make key: their buttons stay dimmed and clicking them closes the popup.
+    func confirmation(
+        _ title: LocalizedStringKey,
+        message: Text,
+        actionTitle: LocalizedStringKey,
+        isPresented: Binding<Bool>,
+        action: @escaping () -> Void
+    ) -> some View {
+        disabled(isPresented.wrappedValue)
+            .overlay {
+                if isPresented.wrappedValue {
+                    ConfirmationCard(title: title, message: message, actionTitle: actionTitle, isPresented: isPresented, action: action)
+                }
+            }
+            .animation(.snappy(duration: 0.2), value: isPresented.wrappedValue)
+    }
+}
+
+private struct ConfirmationCard: View {
+    let title: LocalizedStringKey
+    let message: Text
+    let actionTitle: LocalizedStringKey
+    @Binding var isPresented: Bool
+    let action: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.25)
+                .contentShape(Rectangle())
+                .onTapGesture { isPresented = false }
+
+            VStack(spacing: 6) {
+                Text(title)
+                    .font(.headline)
+                message
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.bottom, 10)
+                HStack(spacing: 10) {
+                    Button { isPresented = false } label: {
+                        Text("Cancel").frame(maxWidth: .infinity)
+                    }
+                    .keyboardShortcut(.cancelAction)
+
+                    Button(role: .destructive) {
+                        // Act first: the presenting binding may hold the item the action needs.
+                        action()
+                        isPresented = false
+                    } label: {
+                        Text(actionTitle).frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.red)
+                }
+                .controlSize(.large)
+                .buttonBorderShape(.capsule)
+            }
+            .padding(20)
+            .frame(width: 280)
+            .background(Theme.background, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 20, y: 6)
+        }
+        .transition(.opacity)
+    }
+}

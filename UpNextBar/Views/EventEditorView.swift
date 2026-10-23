@@ -53,6 +53,15 @@ struct EventEditorView: View {
             .scrollIndicators(.never)
         }
         .onAppear { if isNew { titleFocused = true } }
+        .confirmation(
+            "Delete event?",
+            message: Text("“\(draft.title)” will be removed."),
+            actionTitle: "Delete",
+            isPresented: $confirmDelete
+        ) {
+            model.delete(id: draft.id)
+            model.route = .list
+        }
         .task { await model.refreshNotificationStatus() }
     }
 
@@ -224,14 +233,6 @@ struct EventEditorView: View {
         .buttonStyle(.bordered)
         .controlSize(.large)
         .padding(.top, 8)
-        .confirmationDialog("Delete event?", isPresented: $confirmDelete) {
-            Button("Delete", role: .destructive) {
-                model.delete(id: draft.id)
-                model.route = .list
-            }
-        } message: {
-            Text("“\(draft.title)” will be removed.")
-        }
     }
 
     // MARK: - Helpers

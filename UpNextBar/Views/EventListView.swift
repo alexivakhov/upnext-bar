@@ -19,15 +19,13 @@ struct EventListView: View {
                     .padding(18)
             }
         }
-        .alert(
+        .confirmation(
             "Delete event?",
-            isPresented: Binding(get: { eventToDelete != nil }, set: { if !$0 { eventToDelete = nil } }),
-            presenting: eventToDelete
-        ) { event in
-            Button("Delete", role: .destructive) { model.delete(id: event.id) }
-            Button("Cancel", role: .cancel) {}
-        } message: { event in
-            Text("“\(event.title)” will be removed.")
+            message: Text("“\(eventToDelete?.title ?? "")” will be removed."),
+            actionTitle: "Delete",
+            isPresented: Binding(get: { eventToDelete != nil }, set: { if !$0 { eventToDelete = nil } })
+        ) {
+            if let event = eventToDelete { model.delete(id: event.id) }
         }
     }
 
