@@ -12,8 +12,8 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
     SWIFT_STRICT_CONCURRENCY: complete
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "1.0.1"
+    CURRENT_PROJECT_VERSION: "2"
     # Ad-hoc signing for local builds; replace with a Developer ID team for distribution.
     CODE_SIGN_STYLE: Manual
     CODE_SIGN_IDENTITY: "-"
