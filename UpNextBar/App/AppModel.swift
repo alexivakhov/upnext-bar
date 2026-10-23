@@ -18,6 +18,8 @@ final class AppModel {
     var route: Route = .list
     private(set) var today: CalendarDay = .today()
     private(set) var notificationStatus: UNAuthorizationStatus = .notDetermined
+    /// False when notifications are allowed but their style is "None", so nothing pops up on screen.
+    private(set) var bannersEnabled = true
 
     @ObservationIgnored private let scheduler = NotificationScheduler()
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
@@ -30,6 +32,7 @@ final class AppModel {
         store = EventStore()
         settings = AppSettings()
         guard !Self.isRunningTests else { return }
+        applyAppearance()
         scheduler.installDelegate()
         observeSystemChanges()
         Task { await bootstrap() }
@@ -69,7 +72,17 @@ final class AppModel {
     }
 
     func refreshNotificationStatus() async {
-        notificationStatus = await scheduler.authorizationStatus()
+        let current = await scheduler.currentSettings()
+        notificationStatus = current.status
+        bannersEnabled = current.alertStyle != .none
+    }
+
+    /// Opens UpNext Bar's page in System Settings › Notifications.
+    func openNotificationSettings() {
+        let id = Bundle.main.bundleIdentifier ?? ""
+        if let url = URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(id)") {
+            NSWorkspace.shared.open(url)
+        }
     }
 
     func requestNotificationsIfNeeded() async {
@@ -77,6 +90,27 @@ final class AppModel {
         guard notificationStatus == .notDetermined else { return }
         _ = await scheduler.requestAuthorization()
         await refreshNotificationStatus()
+    }
+
+    // MARK: - Appearance and language
+
+    func applyAppearance() {
+        NSApplication.shared.appearance = switch settings.appearance {
+        case .system: nil
+        case .light: NSAppearance(named: .aqua)
+        case .dark: NSAppearance(named: .darkAqua)
+        }
+    }
+
+    /// Saves the language and restarts the app, since bundles pick their localization only at launch.
+    func changeLanguage(to language: AppLanguage) {
+        guard language != settings.language else { return }
+        settings.language = language
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, _ in
+            Task { @MainActor in NSApp.terminate(nil) }
+        }
     }
 
     /// Called when the popup opens, in case a day boundary passed unnoticed.

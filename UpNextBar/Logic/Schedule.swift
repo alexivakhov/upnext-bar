@@ -38,6 +38,13 @@ enum Schedule {
         }
     }
 
+    /// Up to `count` consecutive occurrences starting with the first one on or after `day`.
+    static func occurrences(of anchor: CalendarDay, recurrence: Recurrence, onOrAfter day: CalendarDay, count: Int) -> [CalendarDay] {
+        guard let first = firstIndex(of: anchor, recurrence: recurrence, onOrAfter: day) else { return [] }
+        let last = recurrence == .never ? first : first + count - 1
+        return (first...last).map { occurrence($0, of: anchor, recurrence: recurrence) }
+    }
+
     static func nextOccurrence(of anchor: CalendarDay, recurrence: Recurrence, onOrAfter day: CalendarDay) -> CalendarDay? {
         firstIndex(of: anchor, recurrence: recurrence, onOrAfter: day).map {
             occurrence($0, of: anchor, recurrence: recurrence)

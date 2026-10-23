@@ -91,6 +91,24 @@ extension ReminderOption: Identifiable {
     }
 }
 
+extension AppearanceMode {
+    var title: LocalizedStringKey {
+        switch self {
+        case .system: "System"
+        case .light: "Light"
+        case .dark: "Dark"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .system: "laptopcomputer"
+        case .light: "sun.max.fill"
+        case .dark: "moon.fill"
+        }
+    }
+}
+
 extension CalendarDay {
     /// "4 November 2026" in the user's language.
     var formatted: String {

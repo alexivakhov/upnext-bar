@@ -2,7 +2,6 @@ import SwiftUI
 
 struct EventListView: View {
     @Environment(AppModel.self) private var model
-    @State private var showPast = false
     @State private var eventToDelete: Event?
 
     var body: some View {
@@ -42,41 +41,50 @@ struct EventListView: View {
 
     private var timeline: some View {
         let upcoming = model.upcoming
-        let past = model.past
+        // Oldest first, so the timeline reads top to bottom through today.
+        let past = model.settings.showPastEvents ? Array(model.past.reversed()) : []
+        let items = past + upcoming
 
-        return ScrollView {
-            LazyVStack(spacing: 0) {
-                ForEach(Array(upcoming.enumerated()), id: \.element.id) { index, item in
-                    if index > 0 {
-                        TimelineConnector(gap: upcoming[index - 1].day.days(until: item.day))
+        return ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                        if index > 0 {
+                            let previous = items[index - 1]
+                            TimelineConnector(
+                                gap: previous.day.days(until: item.day),
+                                today: index == past.count ? model.today : nil
+                            )
                             .padding(.trailing, 12)
-                    }
-                    card(item, isPast: false)
-                }
-
-                if upcoming.isEmpty {
-                    Text("Nothing ahead. Add something to look forward to!")
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .padding(.vertical, 40)
-                }
-
-                if !past.isEmpty {
-                    pastHeader(count: past.count)
-                    if showPast {
-                        ForEach(past) { item in
-                            card(item, isPast: true)
-                                .padding(.bottom, 18)
+                            .id(Self.connectorID(before: item))
                         }
+                        card(item, isPast: index < past.count)
+                    }
+
+                    if upcoming.isEmpty {
+                        Text("Nothing ahead. Add something to look forward to!")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.vertical, 40)
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 20)
+                .padding(.bottom, 90)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 20)
-            .padding(.bottom, 90)
+            .scrollIndicators(.never)
+            .onAppear { scrollToToday(proxy, past: past, upcoming: upcoming) }
+            .onChange(of: model.settings.showPastEvents) { scrollToToday(proxy, past: past, upcoming: upcoming) }
         }
-        .scrollIndicators(.never)
+    }
+
+    private static func connectorID(before item: TimelineItem) -> String { "connector-\(item.id)" }
+
+    /// Past events sit above; start at the today marker so upcoming ones are in view.
+    private func scrollToToday(_ proxy: ScrollViewProxy, past: [TimelineItem], upcoming: [TimelineItem]) {
+        guard !past.isEmpty, let first = upcoming.first else { return }
+        proxy.scrollTo(Self.connectorID(before: first), anchor: .top)
     }
 
     private func card(_ item: TimelineItem, isPast: Bool) -> some View {
@@ -93,33 +101,6 @@ struct EventListView: View {
             Divider()
             Button("Delete", systemImage: "trash", role: .destructive) { eventToDelete = item.event }
         }
-    }
-
-    private func pastHeader(count: Int) -> some View {
-        Button {
-            withAnimation(.snappy) { showPast.toggle() }
-        } label: {
-            HStack {
-                Text("Past")
-                    .font(.subheadline.weight(.semibold))
-                Text(count, format: .number)
-                    .font(.caption.weight(.bold))
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 1)
-                    .background(Theme.field, in: Capsule())
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .rotationEffect(.degrees(showPast ? 90 : 0))
-            }
-            .foregroundStyle(.secondary)
-            .padding(.vertical, 10)
-            .padding(.horizontal, 4)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .padding(.top, 28)
-        .padding(.bottom, showPast ? 14 : 0)
     }
 }
 
