@@ -37,11 +37,13 @@ struct SheetHeader<Leading: View, Trailing: View>: View {
 struct CircleIconButton: View {
     let systemImage: String
     let help: LocalizedStringKey
+    var isActive = false
     let action: () -> Void
 
-    init(_ systemImage: String, help: LocalizedStringKey, action: @escaping () -> Void) {
+    init(_ systemImage: String, help: LocalizedStringKey, isActive: Bool = false, action: @escaping () -> Void) {
         self.systemImage = systemImage
         self.help = help
+        self.isActive = isActive
         self.action = action
     }
 
@@ -49,9 +51,9 @@ struct CircleIconButton: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isActive ? AnyShapeStyle(.white) : AnyShapeStyle(.secondary))
                 .frame(width: 30, height: 30)
-                .background(Theme.field, in: Circle())
+                .background(isActive ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(Theme.field), in: Circle())
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)

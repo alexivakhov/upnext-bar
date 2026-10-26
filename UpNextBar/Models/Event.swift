@@ -5,28 +5,40 @@ struct Event: Identifiable, Codable, Hashable, Sendable {
     var title: String
     /// The first (or only) occurrence. Recurring events repeat from this day.
     var date: CalendarDay
+    /// Last day of a multi-day event; nil for a single-day one. Recurring events keep the same length.
+    var endDate: CalendarDay?
     /// SF Symbol name.
     var icon: String
     var color: EventColor
     var recurrence: Recurrence
     var reminder: ReminderOption
+    var comment: String
 
     init(
         id: UUID = UUID(),
         title: String = "",
         date: CalendarDay,
+        endDate: CalendarDay? = nil,
         icon: String = EventIcon.default,
         color: EventColor = .green,
         recurrence: Recurrence = .never,
-        reminder: ReminderOption = .none
+        reminder: ReminderOption = .none,
+        comment: String = ""
     ) {
         self.id = id
         self.title = title
         self.date = date
+        self.endDate = endDate
         self.icon = icon
         self.color = color
         self.recurrence = recurrence
         self.reminder = reminder
+        self.comment = comment
+    }
+
+    /// Days an occurrence lasts beyond its first day.
+    var duration: Int {
+        endDate.map { max(0, date.days(until: $0)) } ?? 0
     }
 
     /// The first occurrence on or after `day`, or nil for a one-off event that has passed.
@@ -41,10 +53,12 @@ struct Event: Identifiable, Codable, Hashable, Sendable {
         id = try container.decode(UUID.self, forKey: .id)
         title = try container.decode(String.self, forKey: .title)
         date = try container.decode(CalendarDay.self, forKey: .date)
+        endDate = try? container.decodeIfPresent(CalendarDay.self, forKey: .endDate)
         icon = (try? container.decode(String.self, forKey: .icon)) ?? EventIcon.default
         color = (try? container.decode(EventColor.self, forKey: .color)) ?? .green
         recurrence = (try? container.decode(Recurrence.self, forKey: .recurrence)) ?? .never
         reminder = (try? container.decode(ReminderOption.self, forKey: .reminder)) ?? .none
+        comment = (try? container.decode(String.self, forKey: .comment)) ?? ""
     }
 }
 

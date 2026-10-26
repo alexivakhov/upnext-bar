@@ -137,6 +137,38 @@
         }
       }
     },
+    "Add a note…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a note…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Додайте нотатку…"
+          }
+        }
+      }
+    },
+    "Add end date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add end date"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Додати дату завершення"
+          }
+        }
+      }
+    },
     "Add event": {
       "localizations": {
         "en": {
@@ -313,6 +345,22 @@
         }
       }
     },
+    "Clear": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистити"
+          }
+        }
+      }
+    },
     "Color": {
       "localizations": {
         "en": {
@@ -325,6 +373,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Колір"
+          }
+        }
+      }
+    },
+    "Comment": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comment"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Коментар"
           }
         }
       }
@@ -469,6 +533,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Редагування"
+          }
+        }
+      }
+    },
+    "End date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End date"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дата завершення"
+          }
+        }
+      }
+    },
+    "Event name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Event name"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Назва події"
+          }
+        }
+      }
+    },
+    "Filter": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filter"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фільтр"
           }
         }
       }
@@ -729,6 +841,22 @@
         }
       }
     },
+    "No matching events": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No matching events"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Немає відповідних подій"
+          }
+        }
+      }
+    },
     "None": {
       "localizations": {
         "en": {
@@ -837,6 +965,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "У день події"
+          }
+        }
+      }
+    },
+    "Ongoing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ongoing"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Триває"
           }
         }
       }
@@ -969,6 +1113,22 @@
         }
       }
     },
+    "Remove end date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove end date"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Прибрати дату завершення"
+          }
+        }
+      }
+    },
     "Repeat": {
       "localizations": {
         "en": {
@@ -1045,6 +1205,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Показувати минулі події"
+          }
+        }
+      }
+    },
+    "Start date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start date"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Дата початку"
           }
         }
       }
@@ -1289,6 +1465,22 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "now"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "зараз"
           }
         }
       }

@@ -4,6 +4,9 @@ A macOS menu bar app with cards for the events that matter: birthdays, payments,
 
 - Lives only in the menu bar, with no Dock icon.
 - Colourful cards with an icon, a colour and an "in N days" countdown, plus the number of days between events.
+- Events can last several days: add an end date and the card shows the range and stays on the timeline until it ends.
+- A free-form comment on every event, shown in the editor.
+- Filter the timeline by event name and by icon.
 - Repeats daily, weekly, monthly or yearly. Repeating events move on to their next date by themselves.
 - Reminders on the day of an event or the day before, at the hour you pick in Settings.
 - Optionally shows past one-off events above the upcoming ones, with a "Today" marker in between.
@@ -46,7 +49,7 @@ Builds are signed ad-hoc ("Sign to Run Locally"), so no Apple Developer account 
 UpNextBar/
   App/        entry point (MenuBarExtra) and AppModel: state, navigation, reminder scheduling
   Models/     Event, CalendarDay (a date without time or time zone)
-  Logic/      recurrence maths, card order, reminder plan (pure logic, covered by tests)
+  Logic/      recurrence maths, card order, filter, reminder plan (pure logic, covered by tests)
   Services/   JSON storage, settings, notifications, launch at login
   Views/      SwiftUI screens: list, card, editor, settings
   Resources/  Localizable.xcstrings (en, uk), app icon
@@ -57,7 +60,7 @@ Data is stored in `~/Library/Containers/com.upnextbar.app/Data/Library/Applicati
 
 ## Next
 
-- Filters and sorting
+- Sorting
 - Card background patterns, tags, attachments
 - Several reminders per event
 - iCloud sync, backups

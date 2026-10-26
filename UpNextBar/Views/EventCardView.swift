@@ -14,10 +14,10 @@ struct EventCardView: View {
                 .lineLimit(2, reservesSpace: true)
                 .multilineTextAlignment(.leading)
                 .padding(.bottom, 4)
-            Text(Countdown.caption(daysLeft: item.daysLeft))
+            Text(Countdown.caption(for: item))
                 .font(.caption.weight(.medium))
                 .opacity(0.85)
-            Countdown.phrase(daysLeft: item.daysLeft)
+            Countdown.phrase(for: item)
                 .font(.system(size: 19, weight: .bold, design: .rounded))
             dateRow
                 .frame(height: 24)
@@ -45,7 +45,7 @@ struct EventCardView: View {
     }
 
     private var dateRow: some View {
-        let date = Text(item.day.formatted)
+        let date = Text(item.formattedDates)
             .font(.callout.weight(.medium))
             .opacity(0.9)
         let recurrence = item.event.recurrence

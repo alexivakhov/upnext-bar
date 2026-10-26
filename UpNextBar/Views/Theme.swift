@@ -116,13 +116,25 @@ extension CalendarDay {
     }
 }
 
+extension TimelineItem {
+    /// "4 November 2026", or "5–7 November 2026" for a multi-day event.
+    var formattedDates: String {
+        guard let endDay else { return day.formatted }
+        return (day.date()..<endDay.date()).formatted(.interval.day().month(.wide).year())
+    }
+}
+
 /// Wording for "how far away" an event is.
 enum Countdown {
-    static func caption(daysLeft: Int) -> LocalizedStringKey {
-        daysLeft >= 0 ? "Happening" : "Happened"
+    static func caption(for item: TimelineItem) -> LocalizedStringKey {
+        item.isOngoing ? "Ongoing" : item.daysLeft >= 0 ? "Happening" : "Happened"
     }
 
-    static func phrase(daysLeft: Int) -> Text {
+    static func phrase(for item: TimelineItem) -> Text {
+        item.isOngoing ? Text("now") : phrase(daysLeft: item.daysLeft)
+    }
+
+    private static func phrase(daysLeft: Int) -> Text {
         switch daysLeft {
         case 0: Text("today")
         case 1: Text("tomorrow")
@@ -133,7 +145,7 @@ enum Countdown {
     }
 
     /// Compact form for the menu bar.
-    static func short(daysLeft: Int) -> String {
-        daysLeft == 0 ? String(localized: "Today") : String(localized: "\(daysLeft) d")
+    static func short(for item: TimelineItem) -> String {
+        item.daysLeft <= 0 ? String(localized: "Today") : String(localized: "\(item.daysLeft) d")
     }
 }

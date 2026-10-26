@@ -22,7 +22,7 @@ private struct MenuBarLabel: View {
         if model.settings.showNextEventInMenuBar, let next = model.upcoming.first {
             HStack(spacing: 4) {
                 Image(systemName: next.event.icon)
-                Text(Countdown.short(daysLeft: next.daysLeft))
+                Text(Countdown.short(for: next))
             }
         } else {
             Image(systemName: "binoculars.fill")

@@ -50,4 +50,18 @@ enum Schedule {
             occurrence($0, of: anchor, recurrence: recurrence)
         }
     }
+
+    /// Start of an occurrence that began before `day` but, lasting `duration` more days, is still going on.
+    static func activeOccurrence(of anchor: CalendarDay, recurrence: Recurrence, duration: Int, on day: CalendarDay) -> CalendarDay? {
+        guard duration > 0 else { return nil }
+        let index: Int
+        if let first = firstIndex(of: anchor, recurrence: recurrence, onOrAfter: day) {
+            guard first > 0 else { return nil }
+            index = first - 1
+        } else {
+            index = 0
+        }
+        let start = occurrence(index, of: anchor, recurrence: recurrence)
+        return start < day && start.adding(days: duration) >= day ? start : nil
+    }
 }

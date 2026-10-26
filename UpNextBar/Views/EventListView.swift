@@ -7,6 +7,10 @@ struct EventListView: View {
     var body: some View {
         VStack(spacing: 0) {
             header
+            if model.isFilterVisible && !model.store.events.isEmpty {
+                FilterPanel()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
             if model.store.events.isEmpty {
                 EmptyStateView { model.route = .newEvent }
             } else {
@@ -31,7 +35,17 @@ struct EventListView: View {
 
     private var header: some View {
         SheetHeader("UpNext") {
-            Color.clear.frame(width: 30, height: 30)
+            if model.store.events.isEmpty {
+                Color.clear.frame(width: 30, height: 30)
+            } else {
+                CircleIconButton(
+                    "line.3.horizontal.decrease",
+                    help: "Filter",
+                    isActive: model.filter.isActive
+                ) {
+                    withAnimation(.snappy(duration: 0.2)) { model.isFilterVisible.toggle() }
+                }
+            }
         } trailing: {
             CircleIconButton("slider.horizontal.3", help: "Settings") { model.route = .settings }
         }
@@ -43,7 +57,11 @@ struct EventListView: View {
         let past = model.settings.showPastEvents ? Array(model.past.reversed()) : []
         let items = past + upcoming
 
-        return ScrollViewReader { proxy in
+        if items.isEmpty && model.filter.isActive {
+            return AnyView(NoMatchesView())
+        }
+
+        return AnyView(ScrollViewReader { proxy in
             ScrollView {
                 LazyVStack(spacing: 0) {
                     ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
@@ -59,7 +77,7 @@ struct EventListView: View {
                         card(item, isPast: index < past.count)
                     }
 
-                    if upcoming.isEmpty {
+                    if upcoming.isEmpty && !model.filter.isActive {
                         Text("Nothing ahead. Add something to look forward to!")
                             .font(.callout)
                             .foregroundStyle(.secondary)
@@ -74,7 +92,7 @@ struct EventListView: View {
             .scrollIndicators(.never)
             .onAppear { scrollToToday(proxy, past: past, upcoming: upcoming) }
             .onChange(of: model.settings.showPastEvents) { scrollToToday(proxy, past: past, upcoming: upcoming) }
-        }
+        })
     }
 
     private static func connectorID(before item: TimelineItem) -> String { "connector-\(item.id)" }
@@ -149,6 +167,89 @@ private struct EmptyStateView: View {
             .controlSize(.large)
             .keyboardShortcut("n", modifiers: .command)
             .padding(.top, 6)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct FilterPanel: View {
+    @Environment(AppModel.self) private var model
+    @FocusState private var searchFocused: Bool
+
+    var body: some View {
+        @Bindable var model = model
+        let icons = EventFilter.availableIcons(in: model.store.events)
+
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                TextField("Event name", text: $model.filter.query)
+                    .textFieldStyle(.plain)
+                    .focused($searchFocused)
+                if !model.filter.query.isEmpty {
+                    Button { model.filter.query = "" } label: {
+                        Image(systemName: "xmark.circle.fill").foregroundStyle(.tertiary)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Clear"))
+                }
+            }
+            .padding(10)
+            .background(Theme.field, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+            if icons.count > 1 {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 40, maximum: 44), spacing: 6)], spacing: 6) {
+                    ForEach(icons, id: \.self) { icon in
+                        let isSelected = model.filter.icons.contains(icon)
+                        Button {
+                            if isSelected { model.filter.icons.remove(icon) } else { model.filter.icons.insert(icon) }
+                        } label: {
+                            Image(systemName: icon)
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(isSelected ? Color.accentColor : .primary)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 36)
+                                .background(
+                                    isSelected ? Color.accentColor.opacity(0.18) : .clear,
+                                    in: RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                )
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                    }
+                }
+            }
+
+            if model.filter.isActive {
+                Button("Clear") { model.filter = EventFilter() }
+                    .buttonStyle(.bordered)
+                    .buttonBorderShape(.capsule)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .onAppear { searchFocused = true }
+        .overlay(alignment: .bottom) { Divider().opacity(0.5) }
+    }
+}
+
+private struct NoMatchesView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        VStack(spacing: 12) {
+            Spacer()
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 40))
+                .foregroundStyle(.tertiary)
+            Text("No matching events")
+                .font(.system(.title3, design: .rounded).weight(.bold))
+            Button("Clear") { model.filter = EventFilter() }
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.capsule)
             Spacer()
         }
         .frame(maxWidth: .infinity)

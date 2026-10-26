@@ -7,6 +7,7 @@ struct EventEditorView: View {
     private let isNew: Bool
     @State private var draft: Event
     @State private var showDatePicker = false
+    @State private var showEndDatePicker = false
     @State private var showAllIcons = false
     @State private var confirmDelete = false
     @FocusState private var titleFocused: Bool
@@ -46,6 +47,7 @@ struct EventEditorView: View {
                     iconSection
                     colorSection
                     reminderSection
+                    commentSection
                     if !isNew { deleteButton }
                 }
                 .padding(16)
@@ -80,7 +82,7 @@ struct EventEditorView: View {
     }
 
     private var dateSection: some View {
-        FieldSection("Date") {
+        FieldSection(draft.endDate == nil ? "Date" : "Start date") {
             HStack {
                 Button {
                     showDatePicker.toggle()
@@ -102,6 +104,23 @@ struct EventEditorView: View {
 
                 Spacer()
 
+                Button {
+                    draft.endDate = draft.endDate == nil ? draft.date.adding(days: 1) : nil
+                } label: {
+                    Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+                        .font(.headline)
+                        .foregroundStyle(tint)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 9)
+                        .background(
+                            tint.opacity(draft.endDate == nil ? 0.08 : 0.2),
+                            in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        )
+                }
+                .buttonStyle(.plain)
+                .help(Text(draft.endDate == nil ? "Add end date" : "Remove end date"))
+                .accessibilityAddTraits(draft.endDate == nil ? [] : .isSelected)
+
                 Picker(selection: $draft.recurrence) {
                     ForEach(Recurrence.allCases) { recurrence in
                         Text(recurrence.title).tag(recurrence)
@@ -112,6 +131,30 @@ struct EventEditorView: View {
                 .pickerStyle(.menu)
                 .fixedSize()
                 .help(Text("Repeat"))
+            }
+
+            if let endDate = draft.endDate {
+                Text("End date")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
+                Button {
+                    showEndDatePicker.toggle()
+                } label: {
+                    Text(endDate.formatted)
+                        .font(.headline)
+                        .foregroundStyle(tint)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(tint.opacity(0.15), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .popover(isPresented: $showEndDatePicker, arrowEdge: .bottom) {
+                    DatePicker("End date", selection: endDateBinding, in: draft.date.date()..., displayedComponents: .date)
+                        .datePickerStyle(.graphical)
+                        .labelsHidden()
+                        .padding(12)
+                }
             }
 
             if let followingDates {
@@ -223,6 +266,16 @@ struct EventEditorView: View {
         .task { await model.refreshNotificationStatus() }
     }
 
+    private var commentSection: some View {
+        FieldSection("Comment") {
+            TextField("Add a note…", text: $draft.comment, axis: .vertical)
+                .textFieldStyle(.plain)
+                .lineLimit(3...8)
+                .padding(12)
+                .background(Theme.field, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+    }
+
     private var deleteButton: some View {
         Button(role: .destructive) {
             confirmDelete = true
@@ -256,7 +309,19 @@ struct EventEditorView: View {
     private var dateBinding: Binding<Date> {
         Binding(
             get: { draft.date.date() },
-            set: { draft.date = CalendarDay($0) }
+            set: {
+                // Moving the start carries the end along, so the length stays the same.
+                let start = CalendarDay($0)
+                if let end = draft.endDate { draft.endDate = start.adding(days: draft.date.days(until: end)) }
+                draft.date = start
+            }
+        )
+    }
+
+    private var endDateBinding: Binding<Date> {
+        Binding(
+            get: { (draft.endDate ?? draft.date).date() },
+            set: { draft.endDate = CalendarDay($0) }
         )
     }
 
@@ -267,6 +332,8 @@ struct EventEditorView: View {
     private func save() {
         guard canSave else { return }
         draft.title = trimmedTitle
+        if let end = draft.endDate, end <= draft.date { draft.endDate = nil }
+        draft.comment = draft.comment.trimmingCharacters(in: .whitespacesAndNewlines)
         model.save(draft)
         model.route = .list
     }

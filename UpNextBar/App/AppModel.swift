@@ -16,6 +16,8 @@ final class AppModel {
     let store: EventStore
     let settings: AppSettings
     var route: Route = .list
+    var filter = EventFilter()
+    var isFilterVisible = false
     private(set) var today: CalendarDay = .today()
     private(set) var notificationStatus: UNAuthorizationStatus = .notDetermined
     /// False when notifications are allowed but their style is "None", so nothing pops up on screen.
@@ -38,13 +40,14 @@ final class AppModel {
         Task { await bootstrap() }
     }
 
-    var upcoming: [TimelineItem] { Timeline.upcoming(store.events, today: today) }
-    var past: [TimelineItem] { Timeline.past(store.events, today: today) }
+    var upcoming: [TimelineItem] { filter.apply(to: Timeline.upcoming(store.events, today: today)) }
+    var past: [TimelineItem] { filter.apply(to: Timeline.past(store.events, today: today)) }
 
     // MARK: - Editing
 
     func save(_ event: Event) {
         store.upsert(event)
+        pruneFilter()
         Task {
             if event.reminder != .none { await requestNotificationsIfNeeded() }
             rescheduleReminders()
@@ -53,7 +56,13 @@ final class AppModel {
 
     func delete(id: UUID) {
         store.delete(id: id)
+        pruneFilter()
         rescheduleReminders()
+    }
+
+    /// Drops picked icons that no event uses any more, so the filter can't hide everything invisibly.
+    private func pruneFilter() {
+        filter.icons.formIntersection(store.events.map(\.icon))
     }
 
     // MARK: - Reminders

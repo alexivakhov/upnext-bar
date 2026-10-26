@@ -164,3 +164,69 @@ struct EventStoreTests {
         #expect(event.icon == EventIcon.default)
     }
 }
+
+struct EventFilterTests {
+    private let events = [
+        Event(title: "Pay: iCloud+", date: day(2026, 11, 7), icon: "creditcard.fill"),
+        Event(title: "Game: Zelda", date: day(2026, 11, 5), icon: "gamecontroller.fill"),
+        Event(title: "Pay: Netflix", date: day(2026, 11, 9), icon: "tv.fill"),
+    ]
+
+    @Test func inactiveFilterMatchesEverything() {
+        let filter = EventFilter(query: "  ")
+        #expect(!filter.isActive)
+        #expect(events.allSatisfy(filter.matches))
+    }
+
+    @Test func matchesNameIgnoringCase() {
+        let filter = EventFilter(query: "pAY")
+        #expect(events.filter(filter.matches).map(\.title) == ["Pay: iCloud+", "Pay: Netflix"])
+    }
+
+    @Test func matchesAnyPickedIcon() {
+        let filter = EventFilter(icons: ["tv.fill", "gamecontroller.fill"])
+        #expect(events.filter(filter.matches).count == 2)
+    }
+
+    @Test func combinesNameAndIcons() {
+        let filter = EventFilter(query: "pay", icons: ["tv.fill"])
+        #expect(events.filter(filter.matches).map(\.title) == ["Pay: Netflix"])
+    }
+
+    @Test func availableIconsFollowEditorOrder() {
+        #expect(EventFilter.availableIcons(in: events) == ["creditcard.fill", "gamecontroller.fill", "tv.fill"])
+    }
+
+    @Test func commentDecodesLeniently() throws {
+        let json = #"{"id":"\#(UUID().uuidString)","title":"A","date":{"year":2026,"month":11,"day":5}}"#
+        let event = try JSONDecoder().decode(Event.self, from: Data(json.utf8))
+        #expect(event.comment == "")
+    }
+}
+
+struct MultiDayEventTests {
+    private let today = day(2026, 11, 6)
+
+    @Test func durationFollowsEndDate() {
+        #expect(Event(date: day(2026, 11, 5), endDate: day(2026, 11, 8)).duration == 3)
+        #expect(Event(date: day(2026, 11, 5)).duration == 0)
+    }
+
+    @Test func ongoingEventStaysUpcomingUntilItEnds() {
+        let trip = Event(title: "Trip", date: day(2026, 11, 5), endDate: day(2026, 11, 7))
+        let item = Timeline.upcoming([trip], today: today).first
+        #expect(item?.day == day(2026, 11, 5))
+        #expect(item?.isOngoing == true)
+        #expect(Timeline.upcoming([trip], today: day(2026, 11, 8)).isEmpty)
+        #expect(Timeline.past([trip], today: today).isEmpty)
+        #expect(Timeline.past([trip], today: day(2026, 11, 8)).count == 1)
+    }
+
+    @Test func recurringEventCountsItsCurrentOccurrenceAsOngoing() {
+        let event = Event(date: day(2026, 1, 5), endDate: day(2026, 1, 7), recurrence: .monthly)
+        let item = Timeline.upcoming([event], today: day(2026, 11, 6)).first
+        #expect(item?.day == day(2026, 11, 5))
+        #expect(item?.endDay == day(2026, 11, 7))
+        #expect(Timeline.upcoming([event], today: day(2026, 11, 8)).first?.day == day(2026, 12, 5))
+    }
+}
