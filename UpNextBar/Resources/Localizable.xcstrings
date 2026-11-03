@@ -121,6 +121,22 @@
         }
       }
     },
+    "3 days before": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3 days before"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "За 3 дні"
+          }
+        }
+      }
+    },
     "Add": {
       "localizations": {
         "en": {
@@ -661,6 +677,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Іконка"
+          }
+        }
+      }
+    },
+    "In 3 days · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In 3 days · %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Через 3 дні · %@"
           }
         }
       }

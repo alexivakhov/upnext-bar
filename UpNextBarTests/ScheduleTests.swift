@@ -111,6 +111,13 @@ struct ReminderPlannerTests {
         #expect(plan.first?.fireDate == day(2026, 11, 4).date(at: 9, in: kyiv))
     }
 
+    @Test func threeDaysBeforeFiresThreeDaysEarlier() {
+        let now = day(2026, 10, 23).date(at: 8, in: kyiv)
+        let event = Event(title: "Trip", date: day(2026, 11, 5), reminder: .threeDaysBefore)
+        let plan = ReminderPlanner.plan(for: [event], hour: 9, now: now, timeZone: kyiv)
+        #expect(plan.first?.fireDate == day(2026, 11, 2).date(at: 9, in: kyiv))
+    }
+
     @Test func skipsReminderWhoseTimeHasPassed() {
         let now = day(2026, 11, 5).date(at: 10, in: kyiv)
         let event = Event(title: "Game", date: day(2026, 11, 5), reminder: .sameDay)

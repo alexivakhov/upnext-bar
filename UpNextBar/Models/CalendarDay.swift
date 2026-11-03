@@ -40,6 +40,23 @@ struct CalendarDay: Codable, Hashable, Comparable, Sendable {
         CalendarDay(Self.utc.date(byAdding: components, to: utcDate)!, timeZone: Self.utc.timeZone)
     }
 
+    /// Day of the week, 1 = Sunday … 7 = Saturday.
+    var weekday: Int {
+        Self.utc.component(.weekday, from: utcDate)
+    }
+
+    var daysInMonth: Int {
+        Self.utc.range(of: .day, in: .month, for: utcDate)!.count
+    }
+
+    var firstOfMonth: CalendarDay {
+        CalendarDay(year: year, month: month, day: 1)
+    }
+
+    var lastOfMonth: CalendarDay {
+        CalendarDay(year: year, month: month, day: daysInMonth)
+    }
+
     /// Whole days from `self` to `other`; negative when `other` is earlier.
     func days(until other: CalendarDay) -> Int {
         Self.utc.dateComponents([.day], from: utcDate, to: other.utcDate).day!
