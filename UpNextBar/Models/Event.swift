@@ -71,7 +71,7 @@ enum Recurrence: String, Codable, CaseIterable, Sendable {
 }
 
 enum ReminderOption: String, Codable, CaseIterable, Sendable {
-    case none, sameDay, dayBefore
+    case none, sameDay, dayBefore, threeDaysBefore
 
     /// How many days before the occurrence the notification fires; nil when there is no reminder.
     var daysBefore: Int? {
@@ -79,6 +79,7 @@ enum ReminderOption: String, Codable, CaseIterable, Sendable {
         case .none: nil
         case .sameDay: 0
         case .dayBefore: 1
+        case .threeDaysBefore: 3
         }
     }
 }

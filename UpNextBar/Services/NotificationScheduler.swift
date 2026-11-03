@@ -46,6 +46,7 @@ final class NotificationScheduler {
     private static func body(for reminder: ReminderOption, occurrence: CalendarDay) -> String {
         let date = occurrence.date().formatted(.dateTime.day().month(.wide).year())
         switch reminder {
+        case .threeDaysBefore: return String(localized: "In 3 days · \(date)")
         case .dayBefore: return String(localized: "Tomorrow · \(date)")
         case .sameDay, .none: return String(localized: "Today · \(date)")
         }

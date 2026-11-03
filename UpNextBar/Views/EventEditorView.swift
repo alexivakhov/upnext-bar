@@ -44,9 +44,9 @@ struct EventEditorView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     nameSection
                     dateSection
+                    reminderSection
                     iconSection
                     colorSection
-                    reminderSection
                     commentSection
                     if !isNew { deleteButton }
                 }
@@ -233,13 +233,7 @@ struct EventEditorView: View {
     private var reminderSection: some View {
         FieldSection("Reminder") {
             VStack(alignment: .leading, spacing: 8) {
-                Picker("Reminder", selection: $draft.reminder) {
-                    ForEach(ReminderOption.allCases) { option in
-                        Text(option.title).tag(option)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
+                ReminderPicker(selection: $draft.reminder)
 
                 if draft.reminder != .none {
                     if model.notificationStatus == .denied || !model.bannersEnabled {
@@ -367,5 +361,33 @@ private struct IconGrid: View {
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
             }
         }
+    }
+}
+
+/// Compact segmented choice; text shrinks a little rather than letting the row outgrow the card.
+private struct ReminderPicker: View {
+    @Binding var selection: ReminderOption
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(ReminderOption.allCases) { option in
+                let isSelected = option == selection
+                Button { selection = option } label: {
+                    Text(option.title)
+                        .font(.system(size: 12, weight: isSelected ? .semibold : .medium))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .foregroundStyle(isSelected ? Color.white : Color.primary)
+                        .padding(.horizontal, 4)
+                        .frame(maxWidth: .infinity, minHeight: 28)
+                        .background(isSelected ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
+            }
+        }
+        .padding(2)
+        .background(Theme.field, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 }

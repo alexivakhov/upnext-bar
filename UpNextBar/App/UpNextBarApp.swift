@@ -2,7 +2,14 @@ import SwiftUI
 
 @main
 struct UpNextBarApp: App {
-    @State private var model = AppModel()
+    @State private var model: AppModel
+    @State private var hover: MenuBarHover
+
+    init() {
+        let model = AppModel()
+        _model = State(initialValue: model)
+        _hover = State(initialValue: MenuBarHover(model: model))
+    }
 
     var body: some Scene {
         MenuBarExtra {

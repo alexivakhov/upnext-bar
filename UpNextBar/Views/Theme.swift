@@ -87,6 +87,7 @@ extension ReminderOption: Identifiable {
         case .none: "None"
         case .sameDay: "On the day"
         case .dayBefore: "Day before"
+        case .threeDaysBefore: "3 days before"
         }
     }
 }
